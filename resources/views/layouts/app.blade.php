@@ -32,6 +32,38 @@
     <link href="{{ asset('assets/assets/css/style.css') }}" rel="stylesheet">
 
     @stack('styles')
+
+    <style>
+    .sidebar .nav-link {
+        padding: 14px 15px !important;
+        margin-bottom: 5px;
+        border-radius: 6px;
+        color: #012970;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #f6f9ff;
+        color: #4154f1;
+    }
+
+    .sidebar .nav-link.active {
+        background-color: #4154f1 !important;
+        color: #fff !important;
+        font-weight: 500;
+    }
+
+    .sidebar .nav-link i {
+        font-size: 1.25rem;
+        width: 28px;
+        margin-right: 12px;
+        transition: all 0.3s;
+    }
+
+    .sidebar .nav-link.active i {
+        color: #fff !important;
+    }
+</style>
 </head>
 
 <body>
@@ -49,11 +81,11 @@
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
         <div class="copyright">
-            &copy; Copyright <strong><span>Sistem Manajemen Motor</span></strong>. All Rights Reserved
+            &copy; Copyright <strong><span>Sistem Simulasi Motor</span></strong>. All Rights Reserved
         </div>
-        <div class="credits">
+        {{-- <div class="credits">
             Designed by <a href="#">Your Company</a>
-        </div>
+        </div> --}}
     </footer><!-- End Footer -->
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
