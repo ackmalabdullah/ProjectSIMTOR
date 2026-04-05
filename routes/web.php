@@ -18,8 +18,13 @@ use Illuminate\Support\Facades\Route;
 // });
 // Route untuk halaman statis (tanpa controller)
 Route::get('/', function () {
-    return redirect('/dashboard');
+    return redirect('/landing');
 });
+
+// Landing Page
+Route::get('/landing', function () {
+    return view('landing.index');
+})->name('landing');
 
 // Dashboard
 Route::get('/dashboard', function () {
@@ -68,9 +73,9 @@ Route::get('/settings', function () {
 })->name('settings');
 
 // FAQ
-Route::get('/faq', function () {
-    return view('faq.index');
-})->name('faq');
+Route::get('/laporan', function () {
+    return view('laporan.index');
+})->name('laporan');
 
 // Logout (nanti diisi dengan logic logout)
 Route::get('/logout', function () {
