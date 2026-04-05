@@ -21,48 +21,18 @@
                         <i class="bi bi-list-ul"></i><span>Semua Motor</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url('/motor/create') }}">
-                        <i class="bi bi-plus-circle"></i><span>Tambah Motor</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/motor/category') }}">
-                        <i class="bi bi-tags"></i><span>Kategori Motor</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/motor/stock') }}">
-                        <i class="bi bi-box-seam"></i><span>Stok Motor</span>
-                    </a>
-                </li>
             </ul>
         </li>
 
         <!-- Simulasi Kredit -->
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#simulasi-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-calculator"></i><span>Simulasi Kredit</span><i class="bi bi-chevron-down ms-auto"></i>
+                <i class="bi bi-calculator"></i><span>History Simulasi</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
             <ul id="simulasi-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                 <li>
-                    <a href="{{ url('/simulasi') }}">
-                        <i class="bi bi-plus-circle"></i><span>Simulasi Baru</span>
-                    </a>
-                </li>
-                <li>
                     <a href="{{ url('/simulasi/history') }}">
                         <i class="bi bi-clock-history"></i><span>Riwayat Simulasi</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/simulasi/approved') }}">
-                        <i class="bi bi-check-circle"></i><span>Disetujui</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/simulasi/rejected') }}">
-                        <i class="bi bi-x-circle"></i><span>Ditolak</span>
                     </a>
                 </li>
             </ul>
@@ -89,11 +59,6 @@
                         <i class="bi bi-trophy"></i><span>Motor Terlaris</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url('/rekomendasi/promo') }}">
-                        <i class="bi bi-gift"></i><span>Promo Spesial</span>
-                    </a>
-                </li>
             </ul>
         </li>
 
@@ -113,45 +78,10 @@
                         <i class="bi bi-person-plus"></i><span>Tambah Pelanggan</span>
                     </a>
                 </li>
-                <li>
-                    <a href="{{ url('/pelanggan/verifikasi') }}">
-                        <i class="bi bi-shield-check"></i><span>Verifikasi Data</span>
-                    </a>
-                </li>
             </ul>
         </li>
 
-        <!-- Transaksi -->
-        <li class="nav-item">
-            <a class="nav-link collapsed" data-bs-target="#transaksi-nav" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-cart"></i><span>Transaksi</span><i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <ul id="transaksi-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                <li>
-                    <a href="{{ url('/transaksi') }}">
-                        <i class="bi bi-receipt"></i><span>Semua Transaksi</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/transaksi/pending') }}">
-                        <i class="bi bi-hourglass-split"></i><span>Pending</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/transaksi/selesai') }}">
-                        <i class="bi bi-check-all"></i><span>Selesai</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url('/transaksi/laporan') }}">
-                        <i class="bi bi-file-text"></i><span>Laporan</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
-
-        <li class="nav-heading">Pengaturan</li>
-
+        
         <!-- User Management -->
         <li class="nav-item">
             <a class="nav-link collapsed" data-bs-target="#user-nav" data-bs-toggle="collapse" href="#">
@@ -175,22 +105,6 @@
                     </a>
                 </li>
             </ul>
-        </li>
-
-        <!-- Pengaturan Sistem -->
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="{{ url('/settings') }}">
-                <i class="bi bi-gear"></i>
-                <span>Pengaturan</span>
-            </a>
-        </li>
-
-        <!-- Backup Database -->
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="{{ url('/backup') }}">
-                <i class="bi bi-database"></i>
-                <span>Backup Database</span>
-            </a>
         </li>
 
         <!-- Laporan -->
