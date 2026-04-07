@@ -82,3 +82,14 @@ Route::get('/logout', function () {
     // Tambahkan logic logout nanti
     return redirect('/');
 })->name('logout');
+
+use Illuminate\Support\Facades\DB;
+
+Route::get('/test-db', function () {
+    try {
+        DB::connection()->getMongoClient();
+        return "Koneksi MongoDB BERHASIL 🔥";
+    } catch (\Exception $e) {
+        return "GAGAL: " . $e->getMessage();
+    }
+});
