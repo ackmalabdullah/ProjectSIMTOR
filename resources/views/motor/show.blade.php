@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Master Data Motor') {{-- Judul ini akan muncul di Topbar --}}
+@section('title', 'Master Data Motor') 
 
 @section('content')
     @endsection
