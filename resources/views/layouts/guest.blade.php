@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-    @include('layouts.header')
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 </head>
+
 <body>
 
     <div class="guest-wrapper">
@@ -11,4 +13,5 @@
 
     @stack('scripts')
 </body>
+
 </html>

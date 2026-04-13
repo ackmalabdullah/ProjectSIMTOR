@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
-use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\DB;
 
 /*
@@ -14,31 +14,17 @@ use Illuminate\Support\Facades\DB;
 // Halaman Utama / Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-// Cek Koneksi MongoDB (Hapus jika project sudah selesai)
-Route::get('/test-db', function () {
-    try {
-        DB::connection()->getMongoClient();
-        return "Koneksi MongoDB BERHASIL 🔥";
-    } catch (\Exception $e) {
-        return "GAGAL: " . $e->getMessage();
-    }
-});
-
 /*
 |--------------------------------------------------------------------------
 | 2. Guest Routes (Hanya untuk yang BELUM login)
 |--------------------------------------------------------------------------
 | Jika user sudah login mencoba akses ini, mereka akan diredirect otomatis
 */
-Route::middleware('guest')->group(function () {
-    
-    // Login
-    Route::get('/login',  [AuthController::class, 'loginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-
-    // Register
-    Route::get('/register',  [AuthController::class, 'registerForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+Route::middleware('guest:admin')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
+    Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [LoginController::class, 'register'])->name('register.submit');
 });
 
 /*
@@ -47,10 +33,10 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 | Di sini tempat fitur utama ProjectSIMTOR kamu berada
 */
-Route::middleware('auth')->group(function () {
+Route::middleware('auth:admin')->group(function () {
 
     // Proses Keluar (POST lebih aman daripada GET)
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Dashboard Utama
     Route::get('/dashboard', function () {
@@ -59,14 +45,22 @@ Route::middleware('auth')->group(function () {
 
     // Manajemen Data Motor
     Route::prefix('motor')->group(function () {
-        Route::get('/', function () { return view('motor.index'); })->name('motor.index');
-        Route::get('/create', function () { return view('motor.create'); })->name('motor.create');
+        Route::get('/', function () {
+            return view('motor.index');
+        })->name('motor.index');
+        Route::get('/create', function () {
+            return view('motor.create');
+        })->name('motor.create');
     });
 
     // Fitur Simulasi Kredit & Riwayat
     Route::prefix('simulasi')->group(function () {
-        Route::get('/', function () { return view('simulasi.index'); })->name('simulasi.index');
-        Route::get('/history', function () { return view('simulasi.history'); })->name('simulasi.history');
+        Route::get('/', function () {
+            return view('simulasi.index');
+        })->name('simulasi.index');
+        Route::get('/history', function () {
+            return view('simulasi.history');
+        })->name('simulasi.history');
     });
 
     // Fitur Rekomendasi Motor
@@ -76,13 +70,22 @@ Route::middleware('auth')->group(function () {
 
     // Fitur Admin & User Management
     Route::prefix('admin')->group(function () {
-        Route::get('/', function () { return view('admin.index'); })->name('admin.index');
-        Route::get('/create', function () { return view('admin.create'); })->name('admin.create');
+        Route::get('/', function () {
+            return view('admin.index');
+        })->name('admin.index');
+        Route::get('/create', function () {
+            return view('admin.create');
+        })->name('admin.create');
     });
 
     // Pengaturan Akun & Laporan
-    Route::get('/profile', function () { return view('profile.index'); })->name('profile');
-    Route::get('/settings', function () { return view('settings.index'); })->name('settings');
-    Route::get('/laporan', function () { return view('laporan.index'); })->name('laporan');
-
+    Route::get('/profile', function () {
+        return view('profile.index');
+    })->name('profile');
+    Route::get('/settings', function () {
+        return view('settings.index');
+    })->name('settings');
+    Route::get('/laporan', function () {
+        return view('laporan.index');
+    })->name('laporan');
 });
