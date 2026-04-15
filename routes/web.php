@@ -3,11 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Auth\LoginController;
-<<<<<<< Updated upstream
 use App\Http\Controllers\Web\AdminController;
-=======
 use App\Http\Controllers\Web\SimulasiController;
->>>>>>> Stashed changes
 use Illuminate\Support\Facades\DB;
 
 /*
