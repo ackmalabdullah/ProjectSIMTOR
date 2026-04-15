@@ -90,18 +90,3 @@ Route::prefix('simulasi')->group(function () {
         return view('laporan.index');
     })->name('laporan');
 });
-
-use App\Models\Admin;
-use Illuminate\Support\Facades\Hash;
-
-Route::get('/test-db', function () {
-
-    Admin::create([
-        'name' => 'Admin Simtor',
-        'email' => 'admin@simtor.com',
-        'username' => 'admin',
-        'password' => Hash::make('123456'),
-    ]);
-
-    return "Database simtor_db & collection admins berhasil dibuat!";
-});
