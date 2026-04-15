@@ -3,11 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Auth\LoginController;
-<<<<<<< Updated upstream
 use App\Http\Controllers\Web\AdminController;
-=======
 use App\Http\Controllers\Web\SimulasiController;
->>>>>>> Stashed changes
 use Illuminate\Support\Facades\DB;
 
 /*
@@ -89,19 +86,4 @@ Route::prefix('simulasi')->group(function () {
     Route::get('/laporan', function () {
         return view('laporan.index');
     })->name('laporan');
-});
-
-use App\Models\Admin;
-use Illuminate\Support\Facades\Hash;
-
-Route::get('/test-db', function () {
-
-    Admin::create([
-        'name' => 'Admin Simtor',
-        'email' => 'admin@simtor.com',
-        'username' => 'admin',
-        'password' => Hash::make('123456'),
-    ]);
-
-    return "Database simtor_db & collection admins berhasil dibuat!";
 });
