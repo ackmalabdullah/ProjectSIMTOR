@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Web\AdminController;
 use Illuminate\Support\Facades\DB;
 
 /*
@@ -70,12 +71,11 @@ Route::middleware('auth:admin')->group(function () {
 
     // Fitur Admin & User Management
     Route::prefix('admin')->group(function () {
-        Route::get('/', function () {
-            return view('admin.index');
-        })->name('admin.index');
-        Route::get('/create', function () {
-            return view('admin.create');
-        })->name('admin.create');
+        Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+        Route::get('/create', [AdminController::class, 'create'])->name('admin.create');
+        Route::post('/', [AdminController::class, 'store'])->name('admin.store');
+        Route::get('/{id}/edit', [AdminController::class, 'edit'])->name('admin.edit');
+        Route::put('/{id}', [AdminController::class, 'update'])->name('admin.update');
     });
 
     // Pengaturan Akun & Laporan

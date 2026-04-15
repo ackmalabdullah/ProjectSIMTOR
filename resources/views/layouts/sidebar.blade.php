@@ -46,7 +46,7 @@
         <li class="nav-item">
             <a class="nav-link {{ request()->is('admin*') ? 'active' : '' }}" href="{{ url('/admin') }}">
                 <i class="bi bi-person-square"></i>
-                <span>User Management</span>
+                <span>Admin Management</span>
             </a>
         </li>
 
