@@ -5,6 +5,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Web\AdminController;
 use App\Http\Controllers\Web\SimulasiController;
+use App\Http\Controllers\Web\MotorController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Web\PelangganController;
 
@@ -49,22 +50,22 @@ Route::middleware('auth:admin')->group(function () {
         return view('dashboard.index');
     })->name('dashboard');
 
-    // Manajemen Data Motor
     Route::prefix('motor')->group(function () {
-        Route::get('/', function () {
-            return view('motor.index');
-        })->name('motor.index');
-        Route::get('/create', function () {
-            return view('motor.create');
-        })->name('motor.create');
+        Route::get('/', [MotorController::class, 'index'])->name('motor.index');
+        Route::get('/create', [MotorController::class, 'create'])->name('motor.create');
+        Route::post('/', [MotorController::class, 'store'])->name('motor.store');
+        Route::get('/{id}', [MotorController::class, 'show'])->name('motor.show');
+        Route::get('/{id}/edit', [MotorController::class, 'edit'])->name('motor.edit');
+        Route::put('/{id}', [MotorController::class, 'update'])->name('motor.update');
+        Route::delete('/{id}', [MotorController::class, 'destroy'])->name('motor.destroy');
     });
 
     // Fitur Simulasi Kredit & Riwayat
-Route::prefix('simulasi')->group(function () {
-    // Menampilkan halaman utama simulasi (lewat Controller)
-    Route::get('/', [SimulasiController::class, 'index'])->name('simulasi.index');
-    Route::get('/history', [SimulasiController::class, 'index'])->name('simulasi.history');
-});
+    Route::prefix('simulasi')->group(function () {
+        // Menampilkan halaman utama simulasi (lewat Controller)
+        Route::get('/', [SimulasiController::class, 'index'])->name('simulasi.index');
+        Route::get('/history', [SimulasiController::class, 'index'])->name('simulasi.history');
+    });
 
     // Fitur Rekomendasi Motor
     Route::get('/rekomendasi', function () {

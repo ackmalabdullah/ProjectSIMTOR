@@ -27,6 +27,7 @@
     <link href="{{ asset('assets/assets/vendor/quill/quill.bubble.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/assets/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Template Main CSS File -->
     <link href="{{ asset('assets/assets/css/style.css') }}" rel="stylesheet">
