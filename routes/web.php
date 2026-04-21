@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Web\AdminController;
 use App\Http\Controllers\Web\SimulasiController;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Web\PelangganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,9 @@ Route::middleware('guest:admin')->group(function () {
 | Di sini tempat fitur utama ProjectSIMTOR kamu berada
 */
 Route::middleware('auth:admin')->group(function () {
+
+    Route::get('/pelanggan', [\App\Http\Controllers\Web\PelangganController::class, 'index'])
+        ->name('pelanggan.index');
 
     // Proses Keluar (POST lebih aman daripada GET)
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
