@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -10,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Honda Credit App',
+      title: 'Motor API App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.red,
@@ -28,146 +30,81 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController nama = TextEditingController();
-  final TextEditingController umur = TextEditingController();
-  final TextEditingController gaji = TextEditingController();
-  final TextEditingController hargaMotor = TextEditingController();
-  final TextEditingController dp = TextEditingController();
-  final TextEditingController tanggungan = TextEditingController();
+  List dataMotor = [];
+  bool isLoading = true;
 
-  String pekerjaan = "Karyawan";
-  String hasil = "";
+  // 🔥 FUNCTION AMBIL API
+  Future<void> getMotor() async {
+    final url = Uri.parse("http://127.0.0.1:8000/api/motor");
 
-  void hitungDummy() {
-    setState(() {
-      hasil = "Tenor disarankan: 3 Tahun\nCicilan: Rp 1.200.000 / bulan";
-    });
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        setState(() {
+          dataMotor = data['data'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
-  Widget inputField(String label, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextField(
-        controller: controller,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          labelText: label,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
-    );
+  // 🔥 AUTO LOAD SAAT HALAMAN DIBUKA
+  @override
+  void initState() {
+    super.initState();
+    getMotor();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Hanya Coba"),
+        title: const Text("Data Motor (API Laravel)"),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // FORM CARD
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    inputField("Nama", nama),
-                    inputField("Umur", umur),
-                    inputField("Gaji / bulan", gaji),
-                    inputField("Harga Motor", hargaMotor),
-                    inputField("DP", dp),
-                    inputField("Jumlah Tanggungan", tanggungan),
 
-                    const SizedBox(height: 10),
+      // 🔥 BODY
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : dataMotor.isEmpty
+              ? const Center(child: Text("Data tidak ada"))
+              : ListView.builder(
+                  itemCount: dataMotor.length,
+                  itemBuilder: (context, index) {
+                    final motor = dataMotor[index];
 
-                    // DROPDOWN
-                    DropdownButtonFormField(
-                      value: pekerjaan,
-                      items: const [
-                        DropdownMenuItem(
-                            value: "Karyawan", child: Text("Karyawan")),
-                        DropdownMenuItem(
-                            value: "Wiraswasta", child: Text("Wiraswasta")),
-                        DropdownMenuItem(
-                            value: "Mahasiswa", child: Text("Mahasiswa")),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          pekerjaan = value.toString();
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: "Pekerjaan",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        leading:
+                            const Icon(Icons.motorcycle, color: Colors.red),
+                        title: Text(
+                          motor['nama_motor'] ?? '-',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          "Harga: Rp ${motor['harga']}",
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // BUTTON
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: hitungDummy,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: const Text(
-                          "Hitung Tenor",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // HASIL
-            if (hasil.isNotEmpty)
-              Card(
-                color: Colors.red.shade50,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      const Text(
-                        "Hasil Prediksi",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        hasil,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-          ],
-        ),
-      ),
     );
   }
 }
