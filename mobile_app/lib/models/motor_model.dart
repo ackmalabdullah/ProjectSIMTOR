@@ -4,11 +4,17 @@ class MotorModel {
   final String category;
   final double harga;
   final String imageUrl;
+
   final String mesin;
   final String transmisi;
   final double berat;
   final String tangki;
   final String konsumsibbm;
+
+  final String merk;
+  final String tipe;
+  final String deskripsi;
+  final String status;
 
   MotorModel({
     required this.id,
@@ -21,74 +27,52 @@ class MotorModel {
     required this.berat,
     required this.tangki,
     required this.konsumsibbm,
+    required this.merk,
+    required this.tipe,
+    required this.deskripsi,
+    required this.status,
   });
+
+  factory MotorModel.fromJson(Map<String, dynamic> json) {
+    return MotorModel(
+      id: json['_id'] ?? '',
+      name: json['nama_motor'] ?? '',
+      category: json['tipe'] ?? '',
+      harga: (json['harga'] ?? 0).toDouble(),
+      imageUrl: json['gambar'] ?? '',
+
+      // sementara default dulu
+      mesin: json['mesin'] ?? '-',
+      transmisi: json['transmisi'] ?? '-',
+      berat: (json['berat'] ?? 0).toDouble(),
+      tangki: json['tangki'] ?? '-',
+      konsumsibbm: json['konsumsibbm'] ?? '-',
+
+      merk: json['merk'] ?? '',
+      tipe: json['tipe'] ?? '',
+      deskripsi: json['deskripsi'] ?? '',
+      status: json['status'] ?? '',
+    );
+  }
 
   String get hargaFormatted {
     final jutaan = harga / 1000000;
+
     if (jutaan == jutaan.truncate()) {
       return 'Rp ${jutaan.truncate()} Jt';
     }
+
     return 'Rp ${jutaan.toStringAsFixed(1)} Jt';
   }
 
   String get hargaLengkap {
     final formatted = harga.toStringAsFixed(0).replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (m) => '${m[1]}.',
-        );
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]}.',
+    );
+
     return 'Rp $formatted';
   }
-
-  static List<MotorModel> get sampleData => [
-        MotorModel(
-          id: '1',
-          name: 'Beat Street',
-          category: 'Matic',
-          harga: 15500000,
-          imageUrl: '',
-          mesin: '108,2 cc',
-          transmisi: 'Otomatis',
-          berat: 93,
-          tangki: '3,7 Liter',
-          konsumsibbm: '60 km/l',
-        ),
-        MotorModel(
-          id: '2',
-          name: 'Vario 125',
-          category: 'Matic',
-          harga: 22000000,
-          imageUrl: '',
-          mesin: '124,9 cc',
-          transmisi: 'Otomatis',
-          berat: 110,
-          tangki: '5,5 Liter',
-          konsumsibbm: '52 km/l',
-        ),
-        MotorModel(
-          id: '3',
-          name: 'Beat Street',
-          category: 'Sport',
-          harga: 15500000,
-          imageUrl: '',
-          mesin: '108,2 cc',
-          transmisi: 'Otomatis',
-          berat: 93,
-          tangki: '3,7 Liter',
-          konsumsibbm: '60 km/l',
-        ),
-        MotorModel(
-          id: '4',
-          name: 'Beat Street',
-          category: 'Adventure',
-          harga: 15500000,
-          imageUrl: '',
-          mesin: '108,2 cc',
-          transmisi: 'Otomatis',
-          berat: 93,
-          tangki: '3,7 Liter',
-          konsumsibbm: '60 km/l',
-        ),
-      ];
 }
 
 class HasilSimulasi {

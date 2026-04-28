@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+
 import '../theme/app_theme.dart';
 import '../models/motor_model.dart';
 import 'detail_screen.dart';
@@ -16,13 +19,64 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedTab = 0;
   String _selectedCategory = 'Semua';
-  final List<String> _categories = ['Semua', 'Matic', 'Sport', 'Adventure'];
+
+  final List<String> _categories = [
+    'Semua',
+    'Matic',
+    'Sport',
+    'Adventure',
+  ];
+
+  List<MotorModel> motorList = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    getMotor();
+  }
+
+  Future<void> getMotor() async {
+    final url = Uri.parse(
+      "http://192.168.0.15:8080/api/motor",
+    );
+
+    try {
+      final response = await http.get(url);
+
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+
+        final List data = jsonData['data'];
+
+        setState(() {
+          motorList = data.map((item) => MotorModel.fromJson(item)).toList();
+
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("ERROR API: $e");
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   List<MotorModel> get _filteredMotors {
-    if (_selectedCategory == 'Semua') return MotorModel.sampleData;
-    return MotorModel.sampleData
-        .where((m) => m.category == _selectedCategory)
-        .toList();
+    if (_selectedCategory == 'Semua') {
+      return motorList;
+    }
+
+    return motorList.where((m) => m.tipe == _selectedCategory).toList();
   }
 
   @override
@@ -47,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // App bar
+          /// APP BAR TITLE
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
             child: Text(
@@ -60,14 +114,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          // Promo Banner
+          /// PROMO BANNER
           Padding(
             padding: const EdgeInsets.all(16),
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [AppTheme.darkRed, AppTheme.primaryRed],
+                  colors: [
+                    AppTheme.darkRed,
+                    AppTheme.primaryRed,
+                  ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -76,33 +133,37 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'Promo Oktober',
                     style: GoogleFonts.poppins(
-                        fontSize: 12, color: AppTheme.white.withOpacity(0.85)),
+                      fontSize: 12,
+                      color: AppTheme.white.withOpacity(0.85),
+                    ),
                   ),
                   Text(
                     'DP mulai 10%',
                     style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.white),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.white,
+                    ),
                   ),
                   Text(
                     'Tenor hingga 36 bulan',
                     style: GoogleFonts.poppins(
-                        fontSize: 12, color: AppTheme.white.withOpacity(0.85)),
+                      fontSize: 12,
+                      color: AppTheme.white.withOpacity(0.85),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
 
-          // Category Filter
+          /// CATEGORY FILTER
           SizedBox(
-            height: 36,
+            height: 40,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -110,21 +171,29 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 final cat = _categories[index];
                 final isSelected = _selectedCategory == cat;
+
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: GestureDetector(
-                    onTap: () => setState(() => _selectedCategory = cat),
+                    onTap: () {
+                      setState(() {
+                        _selectedCategory = cat;
+                      });
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 6),
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color:
                             isSelected ? AppTheme.primaryRed : AppTheme.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                            color: isSelected
-                                ? AppTheme.primaryRed
-                                : AppTheme.borderColor),
+                          color: isSelected
+                              ? AppTheme.primaryRed
+                              : AppTheme.borderColor,
+                        ),
                       ),
                       child: Text(
                         cat,
@@ -144,22 +213,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 12),
 
-          // Motor Grid
+          /// GRID MOTOR
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.85,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-              ),
-              itemCount: _filteredMotors.length,
-              itemBuilder: (context, index) {
-                final motor = _filteredMotors[index];
-                return _buildMotorCard(motor);
-              },
-            ),
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : _filteredMotors.isEmpty
+                    ? const Center(
+                        child: Text("Data motor tidak ada"),
+                      )
+                    : GridView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.78,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: _filteredMotors.length,
+                        itemBuilder: (context, index) {
+                          final motor = _filteredMotors[index];
+                          return _buildMotorCard(motor);
+                        },
+                      ),
           ),
         ],
       ),
@@ -171,7 +249,9 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => DetailScreen(motor: motor)),
+          MaterialPageRoute(
+            builder: (_) => DetailScreen(motor: motor),
+          ),
         );
       },
       child: Container(
@@ -189,19 +269,36 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image placeholder
+            /// IMAGE
             Expanded(
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppTheme.lightGrey,
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(12)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
                 ),
-                child: const Icon(Icons.motorcycle,
-                    size: 64, color: Color(0xFFCCCCCC)),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
+                  child: Image.network(
+                    "http://192.168.0.15:8080/storage/${motor.imageUrl}",
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.motorcycle,
+                        size: 64,
+                        color: Colors.grey,
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
+
+            /// TEXT
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -210,16 +307,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     motor.name,
                     style: GoogleFonts.poppins(
-                        fontSize: 13, fontWeight: FontWeight.w600),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     motor.hargaFormatted,
                     style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.primaryRed),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.primaryRed,
+                    ),
                   ),
                 ],
               ),
@@ -239,15 +340,28 @@ class _HomeScreenState extends State<HomeScreen> {
             const CircleAvatar(
               radius: 48,
               backgroundColor: AppTheme.lightGrey,
-              child: Icon(Icons.person, size: 48, color: AppTheme.grey),
+              child: Icon(
+                Icons.person,
+                size: 48,
+                color: AppTheme.grey,
+              ),
             ),
             const SizedBox(height: 16),
-            Text('Profile',
-                style: GoogleFonts.poppins(
-                    fontSize: 20, fontWeight: FontWeight.w600)),
+            Text(
+              'Profile',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text('user@email.com',
-                style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.grey)),
+            Text(
+              'user@email.com',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: AppTheme.grey,
+              ),
+            ),
           ],
         ),
       ),
@@ -256,10 +370,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBottomNav() {
     final items = [
-      {'icon': Icons.home_outlined, 'label': 'Semua'},
-      {'icon': Icons.calculate_outlined, 'label': 'Simulasi'},
-      {'icon': Icons.history_outlined, 'label': 'Riwayat'},
-      {'icon': Icons.person_outline, 'label': 'Profile'},
+      {
+        'icon': Icons.home_outlined,
+        'label': 'Home',
+      },
+      {
+        'icon': Icons.calculate_outlined,
+        'label': 'Simulasi',
+      },
+      {
+        'icon': Icons.history_outlined,
+        'label': 'Riwayat',
+      },
+      {
+        'icon': Icons.person_outline,
+        'label': 'Profile',
+      },
     ];
 
     return Container(
@@ -267,9 +393,10 @@ class _HomeScreenState extends State<HomeScreen> {
         color: AppTheme.white,
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, -2))
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, -2),
+          )
         ],
       ),
       child: SafeArea(
@@ -279,8 +406,13 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(items.length, (index) {
               final isSelected = _selectedTab == index;
+
               return GestureDetector(
-                onTap: () => setState(() => _selectedTab = index),
+                onTap: () {
+                  setState(() {
+                    _selectedTab = index;
+                  });
+                },
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -316,64 +448,14 @@ class SimulasiListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text('Simulasi Kredit',
-                style: GoogleFonts.poppins(
-                    fontSize: 20, fontWeight: FontWeight.w700)),
+      child: Center(
+        child: Text(
+          "Halaman Simulasi",
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
           ),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: MotorModel.sampleData.length,
-              itemBuilder: (context, index) {
-                final motor = MotorModel.sampleData[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  child: ListTile(
-                    leading: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: AppTheme.lightGrey,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.motorcycle, color: AppTheme.grey),
-                    ),
-                    title: Text(motor.name,
-                        style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600, fontSize: 14)),
-                    subtitle: Text(motor.hargaFormatted,
-                        style: GoogleFonts.poppins(
-                            color: AppTheme.primaryRed,
-                            fontWeight: FontWeight.w600)),
-                    trailing: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(80, 34),
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => SimulasiScreen(motor: motor)),
-                        );
-                      },
-                      child: Text('Simulasi',
-                          style: GoogleFonts.poppins(fontSize: 12)),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

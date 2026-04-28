@@ -7,7 +7,7 @@ use MongoDB\Laravel\Eloquent\Model;
 class Motor extends Model
 {
   protected $connection = 'mongodb';
-  protected $collection = 'motor';
+  protected $collection = 'motors';
 
   protected $fillable = [
     'kode_mpm',
