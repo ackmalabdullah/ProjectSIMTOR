@@ -27,16 +27,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Top Red Section
-          Expanded(
-            flex: 5,
-            child: Container(
+      resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            /// =========================
+            /// TOP RED SECTION
+            /// =========================
+            Container(
               width: double.infinity,
               color: AppTheme.primaryRed,
               child: Stack(
                 children: [
+                  /// Wave putih bawah
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -46,12 +49,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       size: const Size(double.infinity, 80),
                     ),
                   ),
+
+                  /// Content atas
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 40,
+                    ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 30),
+
+                        /// Title
                         Text(
                           'SIMTOR',
                           style: GoogleFonts.poppins(
@@ -61,118 +70,225 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             letterSpacing: 2,
                           ),
                         ),
+
+                        const SizedBox(height: 6),
+
                         Text(
-                          'aplikasi bla bla',
+                          'Simulasi Cicilan Motor Honda',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: AppTheme.white.withOpacity(0.85),
                           ),
                         ),
-                        const Spacer(),
+
+                        const SizedBox(height: 40),
+
+                        /// Logo Placeholder
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: AppTheme.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(
+                            Icons.motorcycle,
+                            size: 48,
+                            color: AppTheme.white,
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        Text(
+                          'LOGO',
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.white,
+                          ),
+                        ),
+
+                        const SizedBox(height: 6),
+
+                        Text(
+                          'Simulasi Cicilan Motor Honda\nCerdas berbasis AI',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: AppTheme.white.withOpacity(0.85),
+                          ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        /// =========================
+                        /// LOGIN / REGISTER TOGGLE
+                        /// =========================
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            /// LOGIN (tidak aktif)
                             OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: AppTheme.white,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                minimumSize: const Size(120, 46),
+                              ),
                               onPressed: () {
                                 Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => const LoginScreen()));
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const LoginScreen(),
+                                  ),
+                                );
                               },
-                              child: Text('Login in',
-                                  style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600)),
+                              child: Text(
+                                'Login',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.white,
+                                ),
+                              ),
                             ),
+
                             const SizedBox(width: 12),
+
+                            /// REGISTER (aktif)
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.white,
                                 foregroundColor: AppTheme.primaryRed,
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25)),
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
                                 minimumSize: const Size(120, 46),
                               ),
                               onPressed: () {},
-                              child: Text('Sign In',
-                                  style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600)),
+                              child: Text(
+                                'Register',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 60),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
 
-          // Bottom White Section
-          Expanded(
-            flex: 5,
-            child: Container(
+            /// =========================
+            /// BOTTOM WHITE SECTION
+            /// =========================
+            Container(
+              width: double.infinity,
               color: AppTheme.white,
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 30),
               child: Column(
                 children: [
+                  /// Username
                   TextField(
                     controller: _usernameController,
                     decoration: const InputDecoration(
                       hintText: 'Username or Email',
                     ),
                   ),
+
                   const SizedBox(height: 12),
+
+                  /// Password
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(hintText: 'Password'),
+                    decoration: const InputDecoration(
+                      hintText: 'Password',
+                    ),
                   ),
+
                   const SizedBox(height: 12),
+
+                  /// Confirm Password
                   TextField(
                     controller: _confirmPasswordController,
                     obscureText: true,
-                    decoration:
-                        const InputDecoration(hintText: 'Confirm Password'),
+                    decoration: const InputDecoration(
+                      hintText: 'Confirm Password',
+                    ),
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (_) => const HomeScreen()));
-                    },
-                    child: Text('Sign In',
+
+                  const SizedBox(height: 24),
+
+                  /// Button Register
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const HomeScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Register',
                         style: GoogleFonts.poppins(
-                            fontSize: 16, fontWeight: FontWeight.w600)),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
+
+                  const SizedBox(height: 14),
+
+                  Text(
+                    'or',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: AppTheme.grey,
+                    ),
+                  ),
+
                   const SizedBox(height: 12),
-                  Text('or',
-                      style: GoogleFonts.poppins(
-                          fontSize: 13, color: AppTheme.grey)),
-                  const SizedBox(height: 10),
+
+                  /// Google Button
                   GestureDetector(
                     onTap: () {},
                     child: Container(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppTheme.borderColor),
+                        border: Border.all(
+                          color: AppTheme.borderColor,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Center(
-                        child: Text('G',
-                            style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red)),
+                        child: Text(
+                          'G',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
