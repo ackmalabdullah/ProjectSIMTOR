@@ -92,3 +92,23 @@ Route::middleware('auth:admin')->group(function () {
         return view('laporan.index');
     })->name('laporan');
 });
+
+use App\Models\Users;
+use Illuminate\Support\Facades\Hash;
+
+Route::get('/test-user', function () {
+
+    Users::create([
+        'nama' => 'Moh. Ackmal Abdullah',
+        'username' => 'ackmal',
+        'email' => 'ackmal@gmail.com',
+        'password' => Hash::make('123456'),
+        'no_telp' => '081234567890',
+        'alamat' => 'Jember, Jawa Timur',
+        'pekerjaan' => 'Mahasiswa',
+        'gaji_per_bulan' => 3000000,
+        'status' => 'aktif',
+    ]);
+
+    return "Collection users berhasil dibuat!";
+});
