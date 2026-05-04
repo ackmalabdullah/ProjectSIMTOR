@@ -58,10 +58,8 @@ class AuthController extends Controller
         }
     }
 
-    // 🔥 LOGIN EMAIL
     public function login(Request $request)
     {
-        // ✅ VALIDASI
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
@@ -75,21 +73,25 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $credentials = $request->only('email', 'password');
-
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
+            // 🔥 CARI USER MANUAL (MONGODB)
+            $user = Users::where('email', $request->email)->first();
+
+            if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Email atau password salah'
                 ], 401);
             }
 
+            // 🔥 BUAT TOKEN MANUAL
+            $token = JWTAuth::fromUser($user);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Login berhasil',
                 'token' => $token,
-                'user' => auth()->user()
+                'user' => $user
             ]);
         } catch (\Exception $e) {
             return response()->json([

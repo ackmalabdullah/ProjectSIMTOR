@@ -19,4 +19,8 @@ class Motor extends Model
     'deskripsi',
     'status'
   ];
+
+  protected $casts = [
+    'harga' => 'integer',
+  ];
 }

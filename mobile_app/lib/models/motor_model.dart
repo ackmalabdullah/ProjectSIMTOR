@@ -1,34 +1,20 @@
 class MotorModel {
   final String id;
   final String name;
-  final String category;
-  final double harga;
-  final String imageUrl;
-
-  final String mesin;
-  final String transmisi;
-  final double berat;
-  final String tangki;
-  final String konsumsibbm;
-
   final String merk;
   final String tipe;
+  final double harga;
+  final String imageUrl;
   final String deskripsi;
   final String status;
 
   MotorModel({
     required this.id,
     required this.name,
-    required this.category,
-    required this.harga,
-    required this.imageUrl,
-    required this.mesin,
-    required this.transmisi,
-    required this.berat,
-    required this.tangki,
-    required this.konsumsibbm,
     required this.merk,
     required this.tipe,
+    required this.harga,
+    required this.imageUrl,
     required this.deskripsi,
     required this.status,
   });
@@ -37,19 +23,10 @@ class MotorModel {
     return MotorModel(
       id: json['_id'] ?? '',
       name: json['nama_motor'] ?? '',
-      category: json['tipe'] ?? '',
-      harga: (json['harga'] ?? 0).toDouble(),
-      imageUrl: json['gambar'] ?? '',
-
-      // sementara default dulu
-      mesin: json['mesin'] ?? '-',
-      transmisi: json['transmisi'] ?? '-',
-      berat: (json['berat'] ?? 0).toDouble(),
-      tangki: json['tangki'] ?? '-',
-      konsumsibbm: json['konsumsibbm'] ?? '-',
-
       merk: json['merk'] ?? '',
       tipe: json['tipe'] ?? '',
+      harga: (json['harga'] as num).toDouble(),
+      imageUrl: json['gambar'] ?? '',
       deskripsi: json['deskripsi'] ?? '',
       status: json['status'] ?? '',
     );
@@ -57,11 +34,6 @@ class MotorModel {
 
   String get hargaFormatted {
     final jutaan = harga / 1000000;
-
-    if (jutaan == jutaan.truncate()) {
-      return 'Rp ${jutaan.truncate()} Jt';
-    }
-
     return 'Rp ${jutaan.toStringAsFixed(1)} Jt';
   }
 
@@ -70,7 +42,6 @@ class MotorModel {
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (m) => '${m[1]}.',
     );
-
     return 'Rp $formatted';
   }
 }

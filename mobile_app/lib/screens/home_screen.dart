@@ -9,6 +9,8 @@ import 'detail_screen.dart';
 import 'simulasi_screen.dart';
 import 'riwayat_screen.dart';
 
+String _searchQuery = '';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -38,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> getMotor() async {
     final url = Uri.parse(
-      "http://192.168.0.15:8080/api/motor",
+      "http://192.168.0.11:8080/api/motor",
     );
 
     try {
@@ -72,11 +74,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<MotorModel> get _filteredMotors {
-    if (_selectedCategory == 'Semua') {
-      return motorList;
-    }
+    return motorList.where((motor) {
+      final matchCategory = _selectedCategory == 'Semua'
+          ? true
+          : motor.tipe.toLowerCase() == _selectedCategory.toLowerCase();
 
-    return motorList.where((m) => m.tipe == _selectedCategory).toList();
+      final matchSearch =
+          motor.name.toLowerCase().contains(_searchQuery.toLowerCase());
+
+      return matchCategory && matchSearch;
+    }).toList();
   }
 
   @override
@@ -102,14 +109,25 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /// APP BAR TITLE
+          /// SEARCH BAR
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-            child: Text(
-              'SIMTOR',
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.textDark,
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Cari motor...",
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ),
@@ -284,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     top: Radius.circular(12),
                   ),
                   child: Image.network(
-                    "http://192.168.0.15:8080/storage/${motor.imageUrl}",
+                    "http://192.168.0.11:8080/storage/${motor.imageUrl}",
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(

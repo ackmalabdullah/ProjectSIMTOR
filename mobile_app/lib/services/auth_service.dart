@@ -4,7 +4,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  static const String baseUrl = "http://10.0.2.2:8000/api"; // emulator
+  // ✅ GANTI KE IP LOKAL KAMU (SAMA DENGAN API MOTOR)
+  static const String baseUrl = "http://192.168.0.11:8080/api";
 
   static final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email'],
@@ -29,8 +30,8 @@ class AuthService {
         }),
       );
 
-      print("Register Response: ${response.body}");
-      print("Status Code: ${response.statusCode}");
+      print("REGISTER STATUS: ${response.statusCode}");
+      print("REGISTER BODY: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
@@ -50,7 +51,7 @@ class AuthService {
     }
   }
 
-  // 🔥 LOGIN DENGAN EMAIL
+  // 🔥 LOGIN EMAIL
   static Future<bool> loginWithEmail(String email, String password) async {
     try {
       final response = await http.post(
@@ -62,8 +63,8 @@ class AuthService {
         }),
       );
 
-      print("Login Response: ${response.body}");
-      print("Status Code: ${response.statusCode}");
+      print("LOGIN STATUS: ${response.statusCode}");
+      print("LOGIN BODY: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -85,7 +86,7 @@ class AuthService {
     }
   }
 
-  // 🔥 LOGIN DENGAN GOOGLE
+  // 🔥 LOGIN GOOGLE
   static Future<bool> loginWithGoogle() async {
     try {
       final account = await _googleSignIn.signIn();
@@ -94,8 +95,6 @@ class AuthService {
         print("User cancel login");
         return false;
       }
-
-      print("Email: ${account.email}");
 
       final response = await http.post(
         Uri.parse("$baseUrl/social-login"),
@@ -107,7 +106,8 @@ class AuthService {
         }),
       );
 
-      print("Google Login Response: ${response.body}");
+      print("GOOGLE LOGIN STATUS: ${response.statusCode}");
+      print("GOOGLE LOGIN BODY: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -129,7 +129,7 @@ class AuthService {
     }
   }
 
-  // 🔥 GET USER DATA
+  // 🔥 GET USER
   static Future<Map<String, dynamic>?> getUserData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -161,15 +161,14 @@ class AuthService {
     try {
       await _googleSignIn.signOut();
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove("token");
-      await prefs.remove("user");
+      await prefs.clear();
       print("Logout berhasil");
     } catch (e) {
       print("ERROR LOGOUT: $e");
     }
   }
 
-  // 🔥 IS LOGGED IN
+  // 🔥 CEK LOGIN
   static Future<bool> isLoggedIn() async {
     try {
       final prefs = await SharedPreferences.getInstance();
