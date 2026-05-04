@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Web\AdminController;
 use App\Http\Controllers\Web\SimulasiController;
 use App\Http\Controllers\Web\MotorController;
+use App\Http\Controllers\Web\RekomendasiController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Web\PelangganController;
 
@@ -67,10 +68,29 @@ Route::middleware('auth:admin')->group(function () {
         Route::get('/history', [SimulasiController::class, 'index'])->name('simulasi.history');
     });
 
-    // Fitur Rekomendasi Motor
-    Route::get('/rekomendasi', function () {
-        return view('rekomendasi.index');
-    })->name('rekomendasi.index');
+    Route::prefix('rekomendasi')->group(function () {
+
+        // ================= MAIN PAGE =================
+        Route::get('/', [RekomendasiController::class, 'index'])
+            ->name('rekomendasi.index');
+
+        // ================= EXPORT ALL =================
+        Route::get('/export', [RekomendasiController::class, 'export'])
+            ->name('rekomendasi.export');
+
+        // ================= EXPORT BY TENOR =================
+        Route::get('/export/tenor/{tenor}', [RekomendasiController::class, 'exportByTenor'])
+            ->name('rekomendasi.export.tenor');
+
+        // ================= DATA BY TENOR (UNTUK DETAIL TABLE) =================
+        Route::get('/data/tenor/{tenor}', [RekomendasiController::class, 'getByTenor'])
+            ->name('rekomendasi.data.tenor');
+
+        // ================= DETAIL USER =================
+        Route::get('/detail/{id}', [RekomendasiController::class, 'show'])
+            ->name('rekomendasi.show');
+
+    });
 
     // Fitur Admin & User Management
     Route::prefix('admin')->group(function () {
