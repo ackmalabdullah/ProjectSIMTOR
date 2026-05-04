@@ -1,17 +1,22 @@
 name: simtor
 description: Simulasi Cicilan Motor Honda - Cerdas berbasis AI
 
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+
+  http: ^1.2.0
   cupertino_icons: ^1.0.6
   google_fonts: ^6.1.0
+
+  google_sign_in: ^6.2.1
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
 import 'register_screen.dart';
 import 'home_screen.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -22,12 +24,60 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // 🔥 LOGIN EMAIL
+  void _loginEmail() async {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Username dan Password harus diisi!")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    bool success = await AuthService.loginWithEmail(
+      _usernameController.text,
+      _passwordController.text,
+    );
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email atau Password salah!")),
+      );
+    }
+  }
+
+  // 🔥 LOGIN GOOGLE
+  void _loginGoogle() async {
+    setState(() => _isLoading = true);
+
+    bool success = await AuthService.loginWithGoogle();
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Login Google gagal")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-
-      // 🔥 pakai SafeArea + SingleChildScrollView biar tidak overflow
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -44,7 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: AppTheme.primaryRed,
                   child: Stack(
                     children: [
-                      /// Wave decoration
                       Positioned(
                         bottom: 0,
                         left: 0,
@@ -54,8 +103,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           size: const Size(double.infinity, 80),
                         ),
                       ),
-
-                      /// Content
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
@@ -72,9 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 letterSpacing: 2,
                               ),
                             ),
-
                             const SizedBox(height: 8),
-
                             Text(
                               'Aplikasi Simulasi Kredit Motor',
                               style: GoogleFonts.poppins(
@@ -82,10 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: AppTheme.white.withOpacity(0.85),
                               ),
                             ),
-
                             const SizedBox(height: 40),
-
-                            /// LOGO
                             Container(
                               width: 90,
                               height: 90,
@@ -99,9 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                             ),
-
                             const SizedBox(height: 14),
-
                             Text(
                               'LOGO',
                               style: GoogleFonts.poppins(
@@ -110,9 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: AppTheme.white,
                               ),
                             ),
-
                             const SizedBox(height: 6),
-
                             Text(
                               'Simulasi Cicilan Motor Honda\nCerdas Berbasis AI',
                               textAlign: TextAlign.center,
@@ -121,10 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: AppTheme.white.withOpacity(0.85),
                               ),
                             ),
-
                             const SizedBox(height: 30),
-
-                            /// BUTTON LOGIN / REGISTER
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -139,7 +174,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       borderRadius: BorderRadius.circular(25),
                                     ),
                                   ),
-                                  onPressed: () {},
+                                  // 🔥 PERBAIKAN: Tambah fungsi login
+                                  onPressed: _isLoading ? null : _loginEmail,
                                   child: Text(
                                     'Login',
                                     style: GoogleFonts.poppins(
@@ -147,9 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(width: 12),
-
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppTheme.white,
@@ -163,8 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) =>
-                                            const RegisterScreen(),
+                                        builder: (_) => const RegisterScreen(),
                                       ),
                                     );
                                   },
@@ -195,6 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       TextField(
                         controller: _usernameController,
+                        enabled: !_isLoading,
                         decoration: InputDecoration(
                           hintText: 'Username or Email',
                           border: OutlineInputBorder(
@@ -206,11 +240,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 16),
-
                       TextField(
                         controller: _passwordController,
+                        enabled: !_isLoading,
                         obscureText: true,
                         decoration: InputDecoration(
                           hintText: 'Password',
@@ -223,9 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -235,26 +266,26 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const HomeScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Login',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          // 🔥 PERBAIKAN: Ganti dengan _loginEmail
+                          onPressed: _isLoading ? null : _loginEmail,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  'Login',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                         ),
                       ),
-
                       const SizedBox(height: 14),
-
                       Text(
                         'or',
                         style: GoogleFonts.poppins(
@@ -262,12 +293,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: AppTheme.grey,
                         ),
                       ),
-
                       const SizedBox(height: 14),
-
-                      /// GOOGLE BUTTON
                       GestureDetector(
-                        onTap: () {},
+                        onTap: _isLoading ? null : _loginGoogle,
                         child: Container(
                           width: 50,
                           height: 50,
@@ -309,23 +337,19 @@ class WavePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final path = Path();
-
     path.moveTo(0, size.height);
-
     path.quadraticBezierTo(
       size.width * 0.25,
       size.height * 0.3,
       size.width * 0.5,
       size.height * 0.6,
     );
-
     path.quadraticBezierTo(
       size.width * 0.75,
       size.height * 0.9,
       size.width,
       size.height * 0.4,
     );
-
     path.lineTo(size.width, size.height);
     path.close();
 

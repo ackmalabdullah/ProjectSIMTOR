@@ -94,21 +94,27 @@ Route::middleware('auth:admin')->group(function () {
 });
 
 use App\Models\Users;
-use Illuminate\Support\Facades\Hash;
 
-Route::get('/test-user', function () {
+Route::get('/test-mongo', function () {
 
-    Users::create([
-        'nama' => 'Moh. Ackmal Abdullah',
-        'username' => 'ackmal',
-        'email' => 'ackmal@gmail.com',
-        'password' => Hash::make('123456'),
-        'no_telp' => '081234567890',
-        'alamat' => 'Jember, Jawa Timur',
+    $user = Users::create([
+        'nama' => 'Mahar',
+        'username' => 'mahar123',
+        'email' => 'mahar@gmail.com',
+        'password' => bcrypt('123456'),
+        'no_telp' => '08123456789',
+        'alamat' => 'Jember',
         'pekerjaan' => 'Mahasiswa',
-        'gaji_per_bulan' => 3000000,
+        'gaji_per_bulan' => 2000000,
         'status' => 'aktif',
+
+        // tambahan
+        'role' => 'user',
+        'provider' => 'manual',
     ]);
 
-    return "Collection users berhasil dibuat!";
+    return response()->json([
+        'message' => 'Berhasil insert ke MongoDB',
+        'data' => $user
+    ]);
 });
