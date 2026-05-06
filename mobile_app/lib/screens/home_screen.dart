@@ -22,12 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTab = 0;
   String _selectedCategory = 'Semua';
 
-  final List<String> _categories = [
-    'Semua',
-    'Matic',
-    'Sport',
-    'Adventure',
-  ];
+  final List<String> _categories = ['Semua', 'Matic', 'Sport', 'Adventure'];
 
   List<MotorModel> motorList = [];
   bool isLoading = true;
@@ -39,9 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> getMotor() async {
-    final url = Uri.parse(
-      "http://192.168.0.11:8080/api/motor",
-    );
+    final url = Uri.parse("http://192.168.0.11:8080/api/motor");
 
     try {
       final response = await http.get(url);
@@ -79,8 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ? true
           : motor.tipe.toLowerCase() == _selectedCategory.toLowerCase();
 
-      final matchSearch =
-          motor.name.toLowerCase().contains(_searchQuery.toLowerCase());
+      final matchSearch = motor.name.toLowerCase().contains(
+        _searchQuery.toLowerCase(),
+      );
 
       return matchCategory && matchSearch;
     }).toList();
@@ -139,10 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [
-                    AppTheme.darkRed,
-                    AppTheme.primaryRed,
-                  ],
+                  colors: [AppTheme.darkRed, AppTheme.primaryRed],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -204,8 +195,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color:
-                            isSelected ? AppTheme.primaryRed : AppTheme.white,
+                        color: isSelected
+                            ? AppTheme.primaryRed
+                            : AppTheme.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
@@ -218,8 +210,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
-                          color:
-                              isSelected ? AppTheme.white : AppTheme.darkGrey,
+                          color: isSelected
+                              ? AppTheme.white
+                              : AppTheme.darkGrey,
                         ),
                       ),
                     ),
@@ -234,28 +227,24 @@ class _HomeScreenState extends State<HomeScreen> {
           /// GRID MOTOR
           Expanded(
             child: isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
+                ? const Center(child: CircularProgressIndicator())
                 : _filteredMotors.isEmpty
-                    ? const Center(
-                        child: Text("Data motor tidak ada"),
-                      )
-                    : GridView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                ? const Center(child: Text("Data motor tidak ada"))
+                : GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 0.78,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),
-                        itemCount: _filteredMotors.length,
-                        itemBuilder: (context, index) {
-                          final motor = _filteredMotors[index];
-                          return _buildMotorCard(motor);
-                        },
-                      ),
+                    itemCount: _filteredMotors.length,
+                    itemBuilder: (context, index) {
+                      final motor = _filteredMotors[index];
+                      return _buildMotorCard(motor);
+                    },
+                  ),
           ),
         ],
       ),
@@ -267,9 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (_) => DetailScreen(motor: motor),
-          ),
+          MaterialPageRoute(builder: (_) => DetailScreen(motor: motor)),
         );
       },
       child: Container(
@@ -281,7 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.black.withOpacity(0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -358,11 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const CircleAvatar(
               radius: 48,
               backgroundColor: AppTheme.lightGrey,
-              child: Icon(
-                Icons.person,
-                size: 48,
-                color: AppTheme.grey,
-              ),
+              child: Icon(Icons.person, size: 48, color: AppTheme.grey),
             ),
             const SizedBox(height: 16),
             Text(
@@ -375,9 +358,31 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Text(
               'user@email.com',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: AppTheme.grey,
+              style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.grey),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () {
+                _showLogoutDialog();
+              },
+              icon: const Icon(Icons.logout),
+              label: Text(
+                'Logout',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryRed,
+                foregroundColor: AppTheme.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
           ],
@@ -386,24 +391,62 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Logout',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            'Apakah Anda yakin ingin logout?',
+            style: GoogleFonts.poppins(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Batal',
+                style: GoogleFonts.poppins(color: AppTheme.grey),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Tutup dialog dulu
+                Navigator.pop(context);
+
+                // Redirect ke Login Screen dengan hapus semua route sebelumnya
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil('/login', (route) => false);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryRed,
+              ),
+              child: Text(
+                'Logout',
+                style: GoogleFonts.poppins(color: AppTheme.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildBottomNav() {
     final items = [
-      {
-        'icon': Icons.home_outlined,
-        'label': 'Home',
-      },
-      {
-        'icon': Icons.calculate_outlined,
-        'label': 'Simulasi',
-      },
-      {
-        'icon': Icons.history_outlined,
-        'label': 'Riwayat',
-      },
-      {
-        'icon': Icons.person_outline,
-        'label': 'Profile',
-      },
+      {'icon': Icons.home_outlined, 'label': 'Home'},
+      {'icon': Icons.calculate_outlined, 'label': 'Simulasi'},
+      {'icon': Icons.history_outlined, 'label': 'Riwayat'},
+      {'icon': Icons.person_outline, 'label': 'Profile'},
     ];
 
     return Container(
@@ -414,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.black.withOpacity(0.08),
             blurRadius: 12,
             offset: const Offset(0, -2),
-          )
+          ),
         ],
       ),
       child: SafeArea(
@@ -445,8 +488,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 11,
                         color: isSelected ? AppTheme.primaryRed : AppTheme.grey,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                     ),
                   ],
@@ -469,10 +513,7 @@ class SimulasiListScreen extends StatelessWidget {
       child: Center(
         child: Text(
           "Halaman Simulasi",
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w700),
         ),
       ),
     );

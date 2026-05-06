@@ -94,9 +94,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _registerGoogle() async {
+    setState(() => _isLoading = true);
+
+    bool success = await AuthService.loginWithGoogle();
+
+    setState(() => _isLoading = false);
+
+    if (success) {
+      _showSnackBar("Register Google berhasil!");
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      });
+    } else {
+      _showSnackBar("Register Google gagal");
+    }
   }
 
   @override
@@ -206,9 +226,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             /// LOGIN
                             OutlinedButton(
                               style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                  color: AppTheme.white,
-                                ),
+                                side: BorderSide(color: AppTheme.white),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                                 ),
@@ -406,9 +424,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? const SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : Text(
                               'Register',
@@ -434,18 +450,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   /// Google Button
                   GestureDetector(
-                    onTap: _isLoading
-                        ? null
-                        : () {
-                            // TODO: implementasi Google Sign-In untuk register
-                          },
+                    onTap: _isLoading ? null : _registerGoogle,
                     child: Container(
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        border: Border.all(
-                          color: AppTheme.borderColor,
-                        ),
+                        border: Border.all(color: AppTheme.borderColor),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Center(
