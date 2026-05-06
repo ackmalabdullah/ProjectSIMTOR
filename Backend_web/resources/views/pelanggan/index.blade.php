@@ -4,10 +4,9 @@
 
 @push('styles')
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-  :root{--red:#cc0000;--red-light:#fff0f0;--red-mid:#ffd6d6;--font:'Plus Jakarta Sans',sans-serif;}
+  :root{--red:#cc0000;--red-light:#fff0f0;--red-mid:#ffd6d6;}
 
-  .pel-wrap{font-family:var(--font); background:#fff; padding:10px; color:#1a1a1a;}
+  .pel-wrap{background:#fff; padding:10px; color:#1a1a1a;}
   .divider-line{width:40px; height:3px; background:var(--red); border-radius:2px; margin-bottom:16px;}
 
   /* Toolbar */
@@ -46,7 +45,7 @@
   .modal-head{background:var(--red); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; color:#fff;}
   .modal-head h6{margin:0; font-weight:600; font-size:14px;}
   .modal-close{background:none; border:none; color:#fff; cursor:pointer; font-size:1.3rem; line-height:1; padding:0;}
-  .modal-body{padding:20px;}
+  .modal-body-c{padding:20px;}
   .detail-row{display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid #f5f5f5; font-size:13px;}
   .detail-row:last-child{border-bottom:none;}
   .dk{color:#999; font-size:12px;} .dv{font-weight:600; color:#1a1a1a;}
@@ -65,109 +64,108 @@
     </nav>
 </div>
 
-<section class="section">
-    <div class="pel-wrap">
-        <div class="divider-line"></div>
+<div class="pel-wrap">
+    <div class="divider-line"></div>
 
-        {{-- Session Message --}}
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+    {{-- Session Message --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
-        {{-- Toolbar --}}
-        <div class="toolbar">
-            <div class="search-wrap">
-                <svg viewBox="0 0 24 24" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <input class="search-input" type="text" id="searchInput"
-                    placeholder="Cari nama atau email..." oninput="doFilter()">
-            </div>
-
-            <div class="ms-auto d-flex align-items-center gap-3">
-                <span class="badge bg-light text-danger border border-danger-subtle" id="countBadge">
-                    {{ count($pelanggan) }} pelanggan
-                </span>
-                <button onclick="exportCSV()" class="btn btn-danger btn-sm px-3 shadow-sm">
-                    <i class="bi bi-download me-1"></i> Ekspor CSV
-                </button>
-            </div>
+    {{-- Toolbar --}}
+    <div class="toolbar">
+        <div class="search-wrap">
+            <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input class="search-input" type="text" id="searchInput"
+                placeholder="Cari nama, email, username..." oninput="doFilter()">
         </div>
 
-        {{-- Table --}}
-        <div class="table-wrap">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Pelanggan</th>
-                        <th>Email</th>
-                        <th>Terdaftar</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tBody">
-                    @forelse($pelanggan as $index => $user)
-                    <tr onclick='showDetail(@json($user))'>
-                        <td><span class="no-text">{{ $index + 1 }}</span></td>
-                        <td>
-                            <div class="user-cell">
-                                <div class="ava">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
-                                <div>
-                                    <div class="u-name">{{ $user->name }}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="u-email">{{ $user->email }}</td>
-                        <td>
-                            <span class="date-pill">
-                                {{ optional($user->created_at)->format('d M Y') ?? '-' }}
-                            </span>
-                        </td>
-                        <td>
-                            @if($user->email_verified_at)
-                                <span class="status-badge status-active">
-                                    <i class="bi bi-check-circle-fill me-1"></i>Terverifikasi
-                                </span>
-                            @else
-                                <span class="status-badge status-inactive">
-                                    <i class="bi bi-x-circle-fill me-1"></i>Belum Verifikasi
-                                </span>
-                            @endif
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-danger"
-                                onclick="event.stopPropagation(); showDetail(@json($user))">
-                                Detail
-                            </button>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr id="emptyRow">
-                        <td colspan="6">
-                            <div class="empty-state">
-                                <i class="bi bi-people"></i>
-                                <p class="mb-0">Belum ada pelanggan terdaftar.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <span class="badge bg-light text-danger border border-danger-subtle" id="countBadge">
+                {{ $pelanggan->count() }} pelanggan
+            </span>
+            <button onclick="exportCSV()" class="btn btn-danger btn-sm px-3 shadow-sm">
+                <i class="bi bi-download me-1"></i> Ekspor CSV
+            </button>
         </div>
-
-        {{-- Pagination --}}
-        @if(isset($pelanggan) && method_exists($pelanggan, 'links'))
-            <div class="d-flex justify-content-end mt-3">
-                {{ $pelanggan->links() }}
-            </div>
-        @endif
     </div>
-</section>
+
+    {{-- Table --}}
+    <div class="table-wrap">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Pelanggan</th>
+                    <th>Username</th>
+                    <th>No. Telp</th>
+                    <th>Terdaftar</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tBody">
+                @forelse($pelanggan as $index => $user)
+                <tr onclick='showDetail(@json($user))'>
+                    <td><span class="no-text">{{ $index + 1 }}</span></td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="ava">{{ strtoupper(substr($user->nama ?? '?', 0, 1)) }}</div>
+                            <div>
+                                <div class="u-name">{{ $user->nama }}</div>
+                                <div class="u-email">{{ $user->email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ $user->username ?? '-' }}</td>
+                    <td>{{ $user->no_telp ?? '-' }}</td>
+                    <td>
+                        <span class="date-pill">
+                            {{ optional($user->created_at)->format('d M Y') ?? '-' }}
+                        </span>
+                    </td>
+                    <td>
+                        @if(($user->status ?? '') === 'aktif')
+                            <span class="status-badge status-active">
+                                <i class="bi bi-check-circle-fill me-1"></i>Aktif
+                            </span>
+                        @else
+                            <span class="status-badge status-inactive">
+                                <i class="bi bi-x-circle-fill me-1"></i>Nonaktif
+                            </span>
+                        @endif
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger"
+                            onclick="event.stopPropagation(); showDetail(@json($user))">
+                            Detail
+                        </button>
+                    </td>
+                </tr>
+                @empty
+                <tr id="emptyRow">
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <p class="mb-0">Belum ada pelanggan terdaftar.</p>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    {{-- Pagination --}}
+    @if(isset($pelanggan) && method_exists($pelanggan, 'links'))
+        <div class="d-flex justify-content-end mt-3">
+            {{ $pelanggan->links() }}
+        </div>
+    @endif
+</div>
 
 {{-- Modal Detail Pelanggan --}}
 <div class="modal-overlay" id="modalOverlay">
@@ -176,7 +174,7 @@
             <h6 id="modalTitle">Detail Pelanggan</h6>
             <button class="modal-close" onclick="closeModal()">&times;</button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body-c">
             <div class="avatar-large" id="modalAvatar">?</div>
             <div id="modalBody"></div>
         </div>
@@ -189,110 +187,77 @@
 
 @push('scripts')
 <script>
-    // Data pelanggan dari Laravel (untuk filter & export)
-    const rawData = {!! json_encode($pelanggan instanceof \Illuminate\Pagination\LengthAwarePaginator ? $pelanggan->items() : $pelanggan->toArray()) !!};
+    const rawData = {!! json_encode($pelanggan->toArray()) !!};
 
     function doFilter() {
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
-
-        if (!q) {
-            renderTable(rawData);
-            return;
-        }
-
+        if (!q) { renderTable(rawData); return; }
         const filtered = rawData.filter(item =>
-            (item.name  && item.name.toLowerCase().includes(q)) ||
-            (item.email && item.email.toLowerCase().includes(q))
+            (item.nama     && item.nama.toLowerCase().includes(q)) ||
+            (item.email    && item.email.toLowerCase().includes(q)) ||
+            (item.username && item.username.toLowerCase().includes(q))
         );
         renderTable(filtered);
     }
 
     function renderTable(data) {
         const tb = document.getElementById('tBody');
-
         if (data.length === 0) {
-            tb.innerHTML = `
-                <tr>
-                    <td colspan="6">
-                        <div class="empty-state">
-                            <i class="bi bi-search"></i>
-                            <p class="mb-0">Data pelanggan tidak ditemukan.</p>
-                        </div>
-                    </td>
-                </tr>`;
+            tb.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="bi bi-search"></i><p class="mb-0">Data pelanggan tidak ditemukan.</p></div></td></tr>';
             document.getElementById('countBadge').textContent = '0 pelanggan';
             return;
         }
-
         tb.innerHTML = data.map((item, i) => {
-            const initial  = item.name ? item.name.charAt(0).toUpperCase() : '?';
-            const tgl      = item.created_at
-                ? new Date(item.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' })
-                : '-';
-            const verified = item.email_verified_at;
-            const badge    = verified
-                ? `<span class="status-badge status-active"><i class="bi bi-check-circle-fill me-1"></i>Terverifikasi</span>`
-                : `<span class="status-badge status-inactive"><i class="bi bi-x-circle-fill me-1"></i>Belum Verifikasi</span>`;
-
+            const initial = item.nama ? item.nama.charAt(0).toUpperCase() : '?';
+            const tgl = item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' }) : '-';
+            const isActive = item.status === 'aktif';
+            const badge = isActive
+                ? '<span class="status-badge status-active"><i class="bi bi-check-circle-fill me-1"></i>Aktif</span>'
+                : '<span class="status-badge status-inactive"><i class="bi bi-x-circle-fill me-1"></i>Nonaktif</span>';
             return `
                 <tr onclick='showDetail(${JSON.stringify(item)})'>
                     <td><span class="no-text">${i + 1}</span></td>
                     <td>
                         <div class="user-cell">
                             <div class="ava">${initial}</div>
-                            <div><div class="u-name">${item.name}</div></div>
+                            <div>
+                                <div class="u-name">${item.nama || '-'}</div>
+                                <div class="u-email">${item.email || '-'}</div>
+                            </div>
                         </div>
                     </td>
-                    <td class="u-email">${item.email}</td>
+                    <td>${item.username || '-'}</td>
+                    <td>${item.no_telp || '-'}</td>
                     <td><span class="date-pill">${tgl}</span></td>
                     <td>${badge}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-danger"
-                            onclick="event.stopPropagation(); showDetail(${JSON.stringify(item)})">
-                            Detail
-                        </button>
-                    </td>
+                    <td><button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); showDetail(${JSON.stringify(item)})">Detail</button></td>
                 </tr>`;
         }).join('');
-
         document.getElementById('countBadge').textContent = data.length + ' pelanggan';
     }
 
     function showDetail(item) {
-        const initial = item.name ? item.name.charAt(0).toUpperCase() : '?';
-        const tgl = item.created_at
-            ? new Date(item.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })
-            : '-';
-        const verified = item.email_verified_at
-            ? new Date(item.email_verified_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' })
-            : null;
+        const initial = item.nama ? item.nama.charAt(0).toUpperCase() : '?';
+        const tgl = item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' }) : '-';
+        const isActive = item.status === 'aktif';
+        const gaji = item.gaji_per_bulan ? 'Rp ' + Number(item.gaji_per_bulan).toLocaleString('id-ID') : '-';
 
-        document.getElementById('modalTitle').textContent = item.name || 'Detail Pelanggan';
+        document.getElementById('modalTitle').textContent = item.nama || 'Detail Pelanggan';
         document.getElementById('modalAvatar').textContent = initial;
-
         document.getElementById('modalBody').innerHTML = `
-            <div class="detail-row">
-                <span class="dk">Nama Lengkap</span>
-                <span class="dv">${item.name}</span>
-            </div>
-            <div class="detail-row">
-                <span class="dk">Email</span>
-                <span class="dv">${item.email}</span>
-            </div>
-            <div class="detail-row">
-                <span class="dk">Tanggal Daftar</span>
-                <span class="dv">${tgl}</span>
-            </div>
-            <div class="detail-row">
-                <span class="dk">Status Email</span>
-                <span class="dv">
-                    ${verified
-                        ? `<span class="status-badge status-active"><i class="bi bi-check-circle-fill me-1"></i>Terverifikasi (${verified})</span>`
-                        : `<span class="status-badge status-inactive"><i class="bi bi-x-circle-fill me-1"></i>Belum Verifikasi</span>`
-                    }
-                </span>
-            </div>`;
-
+            <div class="detail-row"><span class="dk">Nama Lengkap</span><span class="dv">${item.nama || '-'}</span></div>
+            <div class="detail-row"><span class="dk">Username</span><span class="dv">${item.username || '-'}</span></div>
+            <div class="detail-row"><span class="dk">Email</span><span class="dv">${item.email || '-'}</span></div>
+            <div class="detail-row"><span class="dk">No. Telepon</span><span class="dv">${item.no_telp || '-'}</span></div>
+            <div class="detail-row"><span class="dk">Alamat</span><span class="dv">${item.alamat || '-'}</span></div>
+            <div class="detail-row"><span class="dk">Pekerjaan</span><span class="dv">${item.pekerjaan || '-'}</span></div>
+            <div class="detail-row"><span class="dk">Gaji/Bulan</span><span class="dv">${gaji}</span></div>
+            <div class="detail-row"><span class="dk">Provider</span><span class="dv">${item.provider || '-'}</span></div>
+            <div class="detail-row"><span class="dk">Tanggal Daftar</span><span class="dv">${tgl}</span></div>
+            <div class="detail-row"><span class="dk">Status</span><span class="dv">${isActive
+                ? '<span class="status-badge status-active"><i class="bi bi-check-circle-fill me-1"></i>Aktif</span>'
+                : '<span class="status-badge status-inactive"><i class="bi bi-x-circle-fill me-1"></i>Nonaktif</span>'
+            }</span></div>`;
         document.getElementById('modalOverlay').classList.add('open');
     }
 
@@ -301,30 +266,19 @@
     }
 
     function exportCSV() {
-        if (rawData.length === 0) {
-            alert('Tidak ada data untuk diekspor.');
-            return;
-        }
-
-        let csv = '\ufeffNo,Nama,Email,Tanggal Daftar,Status\n';
+        if (rawData.length === 0) { alert('Tidak ada data untuk diekspor.'); return; }
+        let csv = '\ufeffNo,Nama,Username,Email,No Telp,Alamat,Pekerjaan,Gaji/Bulan,Provider,Tanggal Daftar,Status\n';
         rawData.forEach((row, i) => {
-            const tgl = row.created_at
-                ? new Date(row.created_at).toLocaleDateString('id-ID')
-                : '-';
-            const status = row.email_verified_at ? 'Terverifikasi' : 'Belum Verifikasi';
-            csv += `${i + 1},"${row.name}","${row.email}","${tgl}","${status}"\n`;
+            const tgl = row.created_at ? new Date(row.created_at).toLocaleDateString('id-ID') : '-';
+            csv += `${i+1},"${row.nama||'-'}","${row.username||'-'}","${row.email||'-'}","${row.no_telp||'-'}","${row.alamat||'-'}","${row.pekerjaan||'-'}","${row.gaji_per_bulan||'-'}","${row.provider||'-'}","${tgl}","${row.status||'-'}"\n`;
         });
-
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.setAttribute('href', URL.createObjectURL(blob));
         link.setAttribute('download', 'Data_Pelanggan_' + new Date().toLocaleDateString('id-ID').replace(/\//g, '-') + '.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    // Tutup modal jika klik di luar area
     window.onclick = function(event) {
         const modal = document.getElementById('modalOverlay');
         if (event.target === modal) closeModal();
