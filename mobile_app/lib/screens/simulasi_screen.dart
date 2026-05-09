@@ -18,7 +18,7 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
   final _penghasilanController = TextEditingController();
   String? _selectedPekerjaan;
   String? _selectedTenor;
-  double _kelengkapan = 0.6;
+  final double _kelengkapan = 0.6;
 
   final List<String> _pekerjaanOptions = [
     'Karyawan Swasta',

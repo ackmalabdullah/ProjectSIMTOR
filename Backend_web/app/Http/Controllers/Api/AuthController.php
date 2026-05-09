@@ -187,6 +187,60 @@ class AuthController extends Controller
         }
     }
 
+    // UPDATE PROFILE
+    public function updateProfile(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'nama' => 'sometimes|required|string|max:100',
+                'no_telp' => 'sometimes|nullable|string|max:20',
+                'alamat' => 'sometimes|nullable|string|max:255',
+                'pekerjaan' => 'sometimes|nullable|string|max:100',
+                'gaji_per_bulan' => 'sometimes|nullable|integer|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $user = auth()->user();
+
+            // Update hanya field yang dikirim
+            if ($request->has('nama')) {
+                $user->nama = $request->nama;
+            }
+            if ($request->has('no_telp')) {
+                $user->no_telp = $request->no_telp;
+            }
+            if ($request->has('alamat')) {
+                $user->alamat = $request->alamat;
+            }
+            if ($request->has('pekerjaan')) {
+                $user->pekerjaan = $request->pekerjaan;
+            }
+            if ($request->has('gaji_per_bulan')) {
+                $user->gaji_per_bulan = $request->gaji_per_bulan;
+            }
+
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Profile berhasil diupdate',
+                'user' => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Update profile gagal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     // LOGOUT
     public function logout()
     {
