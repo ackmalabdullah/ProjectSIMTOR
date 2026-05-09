@@ -1,25 +1,36 @@
 name: mobile_app
-description: "Aplikasi Simulasi Kredit Motor Honda"
-publish_to: "none"
+description: "A new Flutter project."
+
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.11.5
+  sdk: ^3.10.8
 
 dependencies:
   flutter:
     sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
   google_fonts: ^6.1.0
+
   http: ^1.1.0
-  firebase_core: ^2.24.0
-  firebase_auth: ^4.13.0
-  google_sign_in: ^6.2.0
+
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.16.0
+
+  google_sign_in: ^6.2.1
+
   flutter_secure_storage: ^9.0.0
+
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
   flutter_lints: ^6.0.0
 
 flutter:

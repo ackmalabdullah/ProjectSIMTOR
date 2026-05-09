@@ -6,8 +6,9 @@ import 'package:http/http.dart' as http;
 import '../theme/app_theme.dart';
 import '../models/motor_model.dart';
 import 'detail_screen.dart';
-import 'simulasi_screen.dart';
 import 'riwayat_screen.dart';
+import '../services/auth_service.dart';
+import 'profile_screen.dart';
 
 String _searchQuery = '';
 
@@ -27,14 +28,17 @@ class _HomeScreenState extends State<HomeScreen> {
   List<MotorModel> motorList = [];
   bool isLoading = true;
 
+  String username = 'User';
+
   @override
   void initState() {
     super.initState();
     getMotor();
+    getUser();
   }
 
   Future<void> getMotor() async {
-    final url = Uri.parse("http://192.168.0.11:8080/api/motor");
+    final url = Uri.parse("http://192.168.0.22:8080/api/motor");
 
     try {
       final response = await http.get(url);
@@ -66,6 +70,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> getUser() async {
+    final userData = await AuthService.getUserData();
+
+    if (userData != null) {
+      setState(() {
+        username = userData['username'] ?? 'User';
+      });
+    }
+  }
+
   List<MotorModel> get _filteredMotors {
     return motorList.where((motor) {
       final matchCategory = _selectedCategory == 'Semua'
@@ -90,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildHomeTab(),
           const SimulasiListScreen(),
           const RiwayatScreen(),
-          _buildProfileTab(),
+          const ProfileScreen(),
         ],
       ),
       bottomNavigationBar: _buildBottomNav(),
@@ -102,7 +116,32 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// APP BAR TITLE
+          /// HEADER USER
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Halo, $username 👋',
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textDark,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Temukan motor impianmu',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: AppTheme.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           /// SEARCH BAR
           Padding(
             padding: const EdgeInsets.all(16),
@@ -289,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     top: Radius.circular(12),
                   ),
                   child: Image.network(
-                    "http://192.168.0.11:8080/storage/${motor.imageUrl}",
+                    "http://192.168.0.22:8080/storage/${motor.imageUrl}",
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return const Icon(
@@ -333,111 +372,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildProfileTab() {
-    return SafeArea(
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(
-              radius: 48,
-              backgroundColor: AppTheme.lightGrey,
-              child: Icon(Icons.person, size: 48, color: AppTheme.grey),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Profile',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'user@email.com',
-              style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.grey),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () {
-                _showLogoutDialog();
-              },
-              icon: const Icon(Icons.logout),
-              label: Text(
-                'Logout',
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryRed,
-                foregroundColor: AppTheme.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Logout',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: Text(
-            'Apakah Anda yakin ingin logout?',
-            style: GoogleFonts.poppins(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text(
-                'Batal',
-                style: GoogleFonts.poppins(color: AppTheme.grey),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Tutup dialog dulu
-                Navigator.pop(context);
-
-                // Redirect ke Login Screen dengan hapus semua route sebelumnya
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil('/login', (route) => false);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryRed,
-              ),
-              child: Text(
-                'Logout',
-                style: GoogleFonts.poppins(color: AppTheme.white),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 

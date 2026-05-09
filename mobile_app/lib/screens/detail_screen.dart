@@ -36,7 +36,7 @@ class DetailScreen extends StatelessWidget {
             height: 220,
             color: AppTheme.lightGrey,
             child: Image.network(
-              "http://192.168.0.11:8080/storage/${motor.imageUrl}",
+              "http://192.168.0.22:8080/storage/${motor.imageUrl}",
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return Column(

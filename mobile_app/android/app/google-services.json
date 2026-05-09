@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "971512712348",
-    "project_id": "projectsimtor-25121",
-    "storage_bucket": "projectsimtor-25121.firebasestorage.app"
+    "project_number": "769982400994",
+    "project_id": "projectsimtor-890ef",
+    "storage_bucket": "projectsimtor-890ef.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:971512712348:android:0fb35d0b488c0a0204f159",
+        "mobilesdk_app_id": "1:769982400994:android:698c3078774238ae0bd1bb",
         "android_client_info": {
           "package_name": "com.example.mobile_app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA7Q3rYWBcnpjfiBEvPic267MYE7BMCl1Y"
+          "current_key": "AIzaSyClhbtg3dN2PCzMIHCgxqxxI48TVsLZNuk"
         }
       ],
       "services": {
