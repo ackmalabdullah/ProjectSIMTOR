@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Web\AdminController;
 use App\Http\Controllers\Web\SimulasiController;
 use App\Http\Controllers\Web\MotorController;
+use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\RekomendasiController;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Web\PelangganController;
@@ -47,9 +48,13 @@ Route::middleware('auth:admin')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Dashboard Utama
-    Route::get('/dashboard', function () {
-        return view('dashboard.index');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+    Route::get('/export/motor', [DashboardController::class, 'exportMotor']);
+    Route::get('/export/user', [DashboardController::class, 'exportUser']);
+    Route::get('/export/admin', [DashboardController::class, 'exportAdmin']);
+    Route::get('/export/simulasi', [DashboardController::class, 'exportSimulasi']);
 
     Route::prefix('motor')->group(function () {
         Route::get('/', [MotorController::class, 'index'])->name('motor.index');
