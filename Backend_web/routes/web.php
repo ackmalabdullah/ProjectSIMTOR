@@ -118,28 +118,37 @@ Route::middleware('auth:admin')->group(function () {
     })->name('laporan');
 });
 
-use App\Models\Users;
+use App\Models\SimulasiKredit;
 
-Route::get('/test-mongo', function () {
+Route::get('/test-simulasi', function () {
 
-    $user = Users::create([
-        'nama' => 'Mahar',
-        'username' => 'mahar123',
-        'email' => 'mahar@gmail.com',
-        'password' => bcrypt('123456'),
-        'no_telp' => '08123456789',
-        'alamat' => 'Jember',
-        'pekerjaan' => 'Mahasiswa',
-        'gaji_per_bulan' => 2000000,
-        'status' => 'aktif',
+    $data = SimulasiKredit::create([
 
-        // tambahan
-        'role' => 'user',
-        'provider' => 'manual',
+        'user_id' => '123456',
+        'nama_user' => 'Ackmal',
+
+        'motor_id' => 'MTR001',
+        'nama_motor' => 'Honda Beat',
+
+        'harga_motor' => 18000000,
+
+        'penghasilan' => 5000000,
+
+        'dp_persen' => 10,
+        'dp_nominal' => 1800000,
+
+        'tenor' => 24,
+
+        'cicilan_per_bulan' => 950000,
+
+        'persen_gaji' => 19,
+
+        'status_kelayakan' => 'Layak',
     ]);
 
     return response()->json([
-        'message' => 'Berhasil insert ke MongoDB',
-        'data' => $user
+        'status' => true,
+        'message' => 'Simulasi berhasil disimpan',
+        'data' => $data
     ]);
 });

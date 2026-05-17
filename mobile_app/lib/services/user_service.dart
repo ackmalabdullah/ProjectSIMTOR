@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class UserService {
-  static const String baseUrl = "http://192.168.0.22:8080/api";
+  static const String baseUrl = "http://192.168.1.6:8080/api";
 
   /// Ambil data profile user dari backend (MongoDB)
   static Future<UserModel?> getProfile() async {

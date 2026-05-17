@@ -1,12 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+
 import '../theme/app_theme.dart';
 import '../models/motor_model.dart';
+import '../models/hasil_simulasi.dart';
+import '../services/auth_service.dart';
 import 'hasil_screen.dart';
 
 class SimulasiScreen extends StatefulWidget {
   final MotorModel motor;
+
   const SimulasiScreen({super.key, required this.motor});
 
   @override
@@ -16,8 +23,12 @@ class SimulasiScreen extends StatefulWidget {
 class _SimulasiScreenState extends State<SimulasiScreen> {
   final _namaController = TextEditingController();
   final _penghasilanController = TextEditingController();
+
   String? _selectedPekerjaan;
-  String? _selectedTenor;
+  String? _selectedDp;
+
+  bool isLoading = false;
+
   final double _kelengkapan = 0.6;
 
   final List<String> _pekerjaanOptions = [
@@ -28,7 +39,23 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
     'Lainnya',
   ];
 
-  final List<String> _tenorOptions = ['12 bulan', '18 bulan', '24 bulan', '36 bulan'];
+  final List<String> _dpOptions = ['10', '20', '30', '40', '50', '60'];
+
+  @override
+  void initState() {
+    super.initState();
+    loadUser();
+  }
+
+  Future<void> loadUser() async {
+    final user = await AuthService.getUserData();
+
+    if (user != null) {
+      setState(() {
+        _namaController.text = user['nama'] ?? '';
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -37,30 +64,105 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
     super.dispose();
   }
 
-  void _proses() {
-    final penghasilan =
-        double.tryParse(_penghasilanController.text.replaceAll('.', '')) ??
-            3400000;
-    final tenor = int.tryParse(
-            (_selectedTenor ?? '24 bulan').replaceAll(RegExp(r'[^0-9]'), '')) ??
-        24;
+  Future<void> _proses() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
 
-    final hasil = HasilSimulasi(
-      motorName: 'Honda ${widget.motor.name}',
-      hargaMotor: widget.motor.harga,
-      dpPersen: 0.1,
-      tenorRekomendasi: 24,
-      cicilanPerBulan: 954000,
-      rasioGaji: 0.28,
-      alasanRekomendasi:
-          'Berdasarkan penghasilanmu Rp ${(penghasilan / 1000000).toStringAsFixed(1)} jt/bln, tenor 24 bulan menjaga cicilan di bawah 30% gaji — batas sehat menurut standar OJK. Tenor lebih pendek berisiko memberatkan, tenor lebih panjang menambah bunga total.',
-      tanggal: DateTime.now(),
-    );
+      final penghasilan =
+          double.tryParse(_penghasilanController.text.replaceAll('.', '')) ?? 0;
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => HasilScreen(hasil: hasil)),
-    );
+      final dpPersen = double.tryParse(_selectedDp ?? '10') ?? 10;
+
+      if (penghasilan <= 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Penghasilan harus diisi")),
+        );
+
+        setState(() {
+          isLoading = false;
+        });
+
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse("http://192.168.1.6:8000/predict"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "nama_motor": widget.motor.name,
+          "penghasilan": penghasilan,
+          "dp_persen": dpPersen,
+        }),
+      );
+
+      print("STATUS : ${response.statusCode}");
+      print("BODY : ${response.body}");
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        final hasil = HasilSimulasi(
+          motorId: widget.motor.id,
+
+          motorName: data['motor'],
+
+          hargaMotor: (data['harga_otr'] as num).toDouble(),
+
+          penghasilan: penghasilan,
+
+          dpPersen: dpPersen / 100,
+
+          dpNominal: (data['dp_nominal'] as num).toDouble(),
+
+          tenorRekomendasi: data['tenor_rekomendasi'],
+
+          cicilanPerBulan: (data['cicilan_per_bulan'] as num).toDouble(),
+
+          rasioGaji: (data['persen_dari_gaji'] as num).toDouble() / 100,
+
+          alasanRekomendasi: data['status_kelayakan'] == "LAYAK"
+              ? "Motor masih dalam batas aman cicilan terhadap penghasilan bulanan."
+              : "Cicilan melebihi batas aman penghasilan bulanan sehingga kurang direkomendasikan.",
+
+          tanggal: DateTime.now(),
+
+          // 🔥 INI YANG BENAR
+          statusKelayakan: data['status_kelayakan'],
+
+          imageUrl: widget.motor.imageUrl,
+        );
+
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => HasilScreen(hasil: hasil)),
+        );
+
+        if (result == true) {
+          // refresh data riwayat
+          setState(() {});
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal memproses simulasi")),
+        );
+      }
+    } catch (e) {
+      print("ERROR : $e");
+
+      setState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error : $e")));
+    }
   }
 
   @override
@@ -77,17 +179,16 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
         title: Text(
           '< Simulasi',
           style: GoogleFonts.poppins(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textDark),
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textDark,
+          ),
         ),
       ),
       body: Column(
         children: [
-          // Step indicator
           _buildStepIndicator(currentStep: 1),
 
-          // Motor selected banner
           Container(
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(14),
@@ -105,20 +206,24 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
                     Text(
                       'Motor dipilih',
                       style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: AppTheme.white.withOpacity(0.85)),
+                        fontSize: 12,
+                        color: AppTheme.white.withOpacity(0.85),
+                      ),
                     ),
                     Text(
-                      'Honda ${widget.motor.name}',
+                      widget.motor.name,
                       style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppTheme.white),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppTheme.white,
+                      ),
                     ),
                     Text(
                       widget.motor.hargaLengkap,
                       style: GoogleFonts.poppins(
-                          fontSize: 13, color: AppTheme.white),
+                        fontSize: 13,
+                        color: AppTheme.white,
+                      ),
                     ),
                   ],
                 ),
@@ -133,60 +238,88 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSectionTitle('Data Pribadi'),
+
                   const SizedBox(height: 8),
+
                   TextField(
                     controller: _namaController,
-                    decoration: const InputDecoration(hintText: 'Masukan nama'),
+                    readOnly: true,
+                    decoration: const InputDecoration(hintText: 'Nama User'),
                   ),
+
                   const SizedBox(height: 12),
+
                   TextField(
                     controller: _penghasilanController,
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration:
-                        const InputDecoration(hintText: 'Rp 0', prefixText: 'Rp '),
+                    decoration: const InputDecoration(
+                      hintText: '0',
+                      prefixText: 'Rp ',
+                    ),
                   ),
+
                   const SizedBox(height: 12),
+
                   _buildDropdown(
                     hint: 'Pilih pekerjaan',
                     value: _selectedPekerjaan,
                     items: _pekerjaanOptions,
-                    onChanged: (v) =>
-                        setState(() => _selectedPekerjaan = v),
+                    onChanged: (v) {
+                      setState(() {
+                        _selectedPekerjaan = v;
+                      });
+                    },
                   ),
 
                   const SizedBox(height: 20),
+
                   _buildSectionTitle('Detail Kredit'),
+
                   const SizedBox(height: 8),
+
                   _buildDropdown(
-                    hint: 'Pilih Tenor',
-                    value: _selectedTenor,
-                    items: _tenorOptions,
-                    onChanged: (v) => setState(() => _selectedTenor = v),
+                    hint: 'Pilih DP (%)',
+                    value: _selectedDp,
+                    items: _dpOptions,
+                    onChanged: (v) {
+                      setState(() {
+                        _selectedDp = v;
+                      });
+                    },
                   ),
 
                   const SizedBox(height: 20),
-                  // Progress kelengkapan
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Kelengkapan data',
-                          style: GoogleFonts.poppins(
-                              fontSize: 13, color: AppTheme.grey)),
                       Text(
-                        '${(_kelengkapan * 100).toInt()} %',
+                        'Kelengkapan data',
                         style: GoogleFonts.poppins(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppTheme.primaryRed),
+                          fontSize: 13,
+                          color: AppTheme.grey,
+                        ),
+                      ),
+                      Text(
+                        '${(_kelengkapan * 100).toInt()}%',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.primaryRed,
+                        ),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 6),
+
                   LinearProgressIndicator(
                     value: _kelengkapan,
                     backgroundColor: AppTheme.lightGrey,
-                    valueColor: const AlwaysStoppedAnimation(AppTheme.primaryRed),
+                    valueColor: const AlwaysStoppedAnimation(
+                      AppTheme.primaryRed,
+                    ),
                     minHeight: 8,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -199,11 +332,21 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
 
           Padding(
             padding: const EdgeInsets.all(16),
-            child: ElevatedButton(
-              onPressed: _proses,
-              child: Text('Proses Simulasi',
-                  style: GoogleFonts.poppins(
-                      fontSize: 15, fontWeight: FontWeight.w600)),
+            child: SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : _proses,
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                        'Proses Simulasi',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
             ),
           ),
         ],
@@ -215,7 +358,10 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
     return Text(
       title,
       style: GoogleFonts.poppins(
-          fontSize: 15, fontWeight: FontWeight.w700, color: AppTheme.textDark),
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+        color: AppTheme.textDark,
+      ),
     );
   }
 
@@ -234,17 +380,18 @@ class _SimulasiScreenState extends State<SimulasiScreen> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
-          hint: Text(hint,
-              style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.grey)),
+          hint: Text(
+            hint,
+            style: GoogleFonts.poppins(fontSize: 14, color: AppTheme.grey),
+          ),
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down, color: AppTheme.grey),
-          items: items
-              .map((item) => DropdownMenuItem(
-                    value: item,
-                    child: Text(item,
-                        style: GoogleFonts.poppins(fontSize: 14)),
-                  ))
-              .toList(),
+          items: items.map((item) {
+            return DropdownMenuItem(
+              value: item,
+              child: Text(item, style: GoogleFonts.poppins(fontSize: 14)),
+            );
+          }).toList(),
           onChanged: onChanged,
         ),
       ),
@@ -272,12 +419,16 @@ class _StepCircle extends StatelessWidget {
   final int step;
   final int currentStep;
 
-  const _StepCircle(
-      {required this.label, required this.step, required this.currentStep});
+  const _StepCircle({
+    required this.label,
+    required this.step,
+    required this.currentStep,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isActive = currentStep >= step;
+
     return Column(
       children: [
         Container(
@@ -289,9 +440,7 @@ class _StepCircle extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              step == 1
-                  ? 'V'
-                  : step.toString(),
+              step == 1 ? 'V' : step.toString(),
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -301,11 +450,14 @@ class _StepCircle extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        Text(label,
-            style: GoogleFonts.poppins(
-                fontSize: 11,
-                color: isActive ? AppTheme.primaryRed : AppTheme.grey,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal)),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            color: isActive ? AppTheme.primaryRed : AppTheme.grey,
+            fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
       ],
     );
   }
@@ -313,6 +465,7 @@ class _StepCircle extends StatelessWidget {
 
 class _StepLine extends StatelessWidget {
   final bool isActive;
+
   const _StepLine({required this.isActive});
 
   @override

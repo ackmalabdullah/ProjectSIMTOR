@@ -21,7 +21,7 @@ class MotorModel {
 
   factory MotorModel.fromJson(Map<String, dynamic> json) {
     return MotorModel(
-      id: json['_id'] ?? '',
+      id: json['_id'] ?? json['id'],
       name: json['nama_motor'] ?? '',
       merk: json['merk'] ?? '',
       tipe: json['tipe'] ?? '',
@@ -46,28 +46,28 @@ class MotorModel {
   }
 }
 
-class HasilSimulasi {
-  final String motorName;
-  final double hargaMotor;
-  final double dpPersen;
-  final int tenorRekomendasi;
-  final double cicilanPerBulan;
-  final double rasioGaji;
-  final String alasanRekomendasi;
-  final DateTime tanggal;
+// class HasilSimulasi {
+//   final String motorName;
+//   final double hargaMotor;
+//   final double dpPersen;
+//   final int tenorRekomendasi;
+//   final double cicilanPerBulan;
+//   final double rasioGaji;
+//   final String alasanRekomendasi;
+//   final DateTime tanggal;
 
-  HasilSimulasi({
-    required this.motorName,
-    required this.hargaMotor,
-    required this.dpPersen,
-    required this.tenorRekomendasi,
-    required this.cicilanPerBulan,
-    required this.rasioGaji,
-    required this.alasanRekomendasi,
-    required this.tanggal,
-  });
+//   HasilSimulasi({
+//     required this.motorName,
+//     required this.hargaMotor,
+//     required this.dpPersen,
+//     required this.tenorRekomendasi,
+//     required this.cicilanPerBulan,
+//     required this.rasioGaji,
+//     required this.alasanRekomendasi,
+//     required this.tanggal,
+//   });
 
-  double get totalHarga => hargaMotor * 1.04;
-  double get dpDibayar => hargaMotor * dpPersen;
-  double get sisaKredit => totalHarga - dpDibayar;
-}
+//   double get totalHarga => hargaMotor * 1.04;
+//   double get dpDibayar => hargaMotor * dpPersen;
+//   double get sisaKredit => totalHarga - dpDibayar;
+// }
