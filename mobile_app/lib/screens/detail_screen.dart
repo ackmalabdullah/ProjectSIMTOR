@@ -36,7 +36,7 @@ class DetailScreen extends StatelessWidget {
             height: 220,
             color: AppTheme.lightGrey,
             child: Image.network(
-              "http://192.168.0.22:8080/storage/${motor.imageUrl}",
+              "http://192.168.1.6:8080/storage/${motor.imageUrl}",
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return Column(
@@ -89,8 +89,10 @@ class DetailScreen extends StatelessWidget {
 
                 // STATUS
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: motor.status == 'tersedia'
                         ? Colors.green.withOpacity(0.1)
@@ -156,11 +158,17 @@ class DetailScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: GoogleFonts.poppins(color: AppTheme.grey, fontSize: 14)),
-          Text(value,
-              style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600, fontSize: 14)),
+          Text(
+            label,
+            style: GoogleFonts.poppins(color: AppTheme.grey, fontSize: 14),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );

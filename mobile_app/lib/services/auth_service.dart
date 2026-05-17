@@ -4,10 +4,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  // ✅ GANTI KE IP LOKAL KAMU (SAMA DENGAN API MOTOR)
-  static const String baseUrl = "http://192.168.0.22:8080/api";
+  static const String baseUrl = "http://192.168.1.6:8080/api";
 
-  static final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  static final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email'],
+  );
 
   // 🔥 REGISTER
   static Future<bool> register({
@@ -55,7 +56,10 @@ class AuthService {
       final response = await http.post(
         Uri.parse("$baseUrl/login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+        }),
       );
 
       print("LOGIN STATUS RESPONSE: ${response.statusCode}");
